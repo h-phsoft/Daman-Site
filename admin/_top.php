@@ -1,11 +1,17 @@
 <?php
 /**
- * لوحة التحكم — الترويسة المشتركة الداخلية.
+ * لوحة التحكم — الترويسة المشتركة الداخلية (دالة admin_header_close تُغلق الصفحة).
  * تتطلب: $ADMIN_TITLE, $ADMIN_ACTIVE (اسم الملف بدون امتداد)
  */
 declare(strict_types=1);
-require_once dirname(__DIR__) . '/includes/auth.php';
+
+require_once __DIR__ . '/_crud.php';
 require_admin();
+
+function admin_footer(): void
+{
+    echo "\n  </main>\n</div>\n</body>\n</html>\n";
+}
 
 $u = current_user();
 $adminTitle  = $ADMIN_TITLE ?? 'لوحة التحكم';
