@@ -1,0 +1,7 @@
+/* الخطوط العربية المضمّنة محليًا — Cairo (أساسي) + Tajawal (احتياطي) */
+@font-face{font-family:'Cairo';font-style:normal;font-weight:400;font-display:swap;src:url('Cairo-Regular.woff') format('woff'),url('Cairo-Regular.otf') format('opentype');}
+@font-face{font-family:'Cairo';font-style:normal;font-weight:500;font-display:swap;src:url('Cairo-Medium.woff') format('woff'),url('Cairo-Medium.otf') format('opentype');}
+@font-face{font-family:'Cairo';font-style:normal;font-weight:600;font-display:swap;src:url('Cairo-SemiBold.woff') format('woff'),url('Cairo-SemiBold.otf') format('opentype');}
+@font-face{font-family:'Cairo';font-style:normal;font-weight:700;font-display:swap;src:url('Cairo-Bold.woff') format('woff'),url('Cairo-Bold.otf') format('opentype');}
+@font-face{font-family:'Tajawal';font-style:normal;font-weight:400;font-display:swap;src:url('Tajawal-Regular.woff') format('woff');}
+@font-face{font-family:'Tajawal';font-style:normal;font-weight:700;font-display:swap;src:url('Tajawal-Bold.woff') format('woff');}

@@ -1,0 +1,14 @@
+# منع تنفيذ PHP داخل مجلد الرفع
+php_flag engine off
+Options -Indexes -ExecCGI
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule \.php[0-9]?$ - [F,L,NC]
+</IfModule>
+
+<FilesMatch "\.(php|phar|phtml|pl|py|cgi|sh)$">
+  Require all denied
+</FilesMatch>
+
+AddType text/plain .php .phtml .phar
