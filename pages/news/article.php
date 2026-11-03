@@ -38,7 +38,7 @@ require ROOT_PATH . '/includes/header.php';
 <div class="container section" style="padding-top:0">
   <div style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:2rem;align-items:start" class="article-layout">
     <article class="rich-content" style="max-width:none">
-      <img src="<?= e(upload_url($article['image'], 'img/placeholder-news1.svg')) ?>"
+      <img src="<?= e(upload_url($article['image'], 'news', 'placeholder-news1.svg')) ?>"
            alt="<?= e($article['title']) ?>" style="width:100%;border-radius:12px;box-shadow:var(--shadow)">
       <div class="content-block" style="margin-top:1.4rem">
         <?= clean_html($article['content_html']) ?>

@@ -32,10 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     admin_handle_crud($TABLE, $FIELDS, $REDIRECT);
 }
 
-$rows = fetchAll("SELECT * FROM `$TABLE` ORDER BY sort_order ASC, id ASC");
-if ($TABLE === 'news') {
-    $rows = fetchAll("SELECT * FROM `$TABLE` ORDER BY publish_date DESC, id DESC");
-}
+// جدول الأخبار بلا sort_order: يُرتَّب بالتاريخ، وبقية الجداول بالترتيب اليدوي
+$orderBy = $TABLE === 'news' ? 'publish_date DESC, id DESC' : 'sort_order ASC, id ASC';
+$rows = fetchAll("SELECT * FROM `$TABLE` ORDER BY $orderBy");
 
 /* أعمدة القائمة الافتراضية: نصوص آمنة عبر e() + صور مصغرة */
 if (!isset($LIST_COLS)) {
@@ -53,7 +52,7 @@ if (!isset($LIST_COLS)) {
         }
         $out = [];
         if ($imgCol && !empty($r[$imgCol['name']])) {
-            $out[] = '<img class="row-thumb" src="' . e(upload_url($r[$imgCol['name']])) . '" alt="">';
+            $out[] = '<img class="row-thumb" src="' . e(upload_url($r[$imgCol['name']], $imgCol['upload'])) . '" alt="">';
         } elseif ($imgCol) {
             $out[] = '—';
         }

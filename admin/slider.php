@@ -6,7 +6,7 @@ $TABLE         = 'slider';
 $REDIRECT      = 'slider.php';
 $TITLE_SINGULAR = 'شريحة سلايدر';
 $FIELDS = [
-    ['name' => 'image',    'label' => 'صورة الشريحة', 'type' => 'image', 'dir' => 'slider'],
+    ['name' => 'image',    'label' => 'صورة الشريحة', 'type' => 'image', 'upload' => 'slider'],
     ['name' => 'title',    'label' => 'العنوان',      'type' => 'text', 'nullable' => true],
     ['name' => 'subtitle', 'label' => 'الوصف المختصر', 'type' => 'textarea', 'nullable' => true, 'max' => 300],
     ['name' => 'cta_text', 'label' => 'نص الزر',      'type' => 'text', 'nullable' => true],

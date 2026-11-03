@@ -7,7 +7,7 @@ $REDIRECT      = 'links.php';
 $TITLE_SINGULAR = 'موقع هام';
 $FIELDS = [
     ['name' => 'title', 'label' => 'اسم الموقع', 'type' => 'text'],
-    ['name' => 'image', 'label' => 'الشعار / الصورة', 'type' => 'image', 'dir' => 'links', 'nullable' => true],
+    ['name' => 'image', 'label' => 'الشعار / الصورة', 'type' => 'image', 'upload' => 'links', 'nullable' => true],
     ['name' => 'url',   'label' => 'الرابط', 'type' => 'url'],
     ['name' => 'is_active', 'label' => 'الحالة', 'type' => 'checkbox', 'default' => 1],
 ];

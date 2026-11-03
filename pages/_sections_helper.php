@@ -53,7 +53,7 @@ function render_accordion(array $items, string $prefix): void
       </h3>
       <div class="acc-panel" id="<?= e($pid) ?>" role="region" aria-labelledby="<?= e($tid) ?>" data-open="false">
         <?php if (!empty($it['image'])): ?>
-          <img src="<?= e(upload_url($it['image'], 'img/no-image.svg')) ?>" alt="<?= e($it['title']) ?>" loading="lazy">
+          <img src="<?= e(upload_url($it['image'], 'sections', 'no-image.svg')) ?>" alt="<?= e($it['title']) ?>" loading="lazy">
         <?php endif; ?>
         <?= clean_html($it['content_html']) ?>
       </div>

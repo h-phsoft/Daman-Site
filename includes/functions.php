@@ -27,22 +27,57 @@ function url(string $path = ''): string
 /** رابط أصل (asset) */
 function asset(string $path): string
 {
-    return url('assets/' . ltrim($path, '/'));
+    return url(ASSETS_URL . '/' . ltrim($path, '/'));
 }
 
-/** رابط صورة مرفوعة أو أصل افتراضي */
-function upload_url(?string $path, string $fallback = 'img/no-image.svg'): string
+/* ------------------------------------------------------------------ */
+/* الملفات المرفوعة: قاعدة البيانات تخزّن اسم الملف فقط، والمجلد يأتي من */
+/* UPLOAD_DIRS في config.php حسب نوع المحتوى ($type).                 */
+/* ------------------------------------------------------------------ */
+
+/** اسم ملف نظيف من القيمة المخزّنة (يقبل القيم القديمة التي تحوي مسارًا). */
+function upload_name(?string $stored): string
 {
-    if ($path !== null && trim($path) !== '' && !preg_match('#^https?://#i', $path)) {
-        if (str_starts_with($path, 'uploads/') || str_starts_with($path, 'assets/')) {
-            return url($path);
-        }
-        return url('assets/' . $path);
+    $stored = trim((string)$stored);
+    return $stored === '' ? '' : basename(str_replace('\\', '/', $stored));
+}
+
+/** المجلد النسبي لنوع المحتوى داخل مجلد الرفع. */
+function upload_dir(string $type): string
+{
+    if (!isset(UPLOAD_DIRS[$type])) {
+        throw new InvalidArgumentException('نوع رفع غير معرّف في config.php: ' . $type);
     }
-    if ($path !== null && preg_match('#^https?://#i', $path)) {
-        return $path;
+    return UPLOAD_DIRS[$type];
+}
+
+/** المسار الكامل على القرص لملف مرفوع، أو '' إن لم يوجد اسم. */
+function upload_path(?string $stored, string $type): string
+{
+    $name = upload_name($stored);
+    return $name === '' ? '' : UPLOAD_PATH . '/' . upload_dir($type) . '/' . $name;
+}
+
+/** هل الملف المرفوع موجود فعليًا على القرص؟ */
+function upload_exists(?string $stored, string $type): bool
+{
+    $p = upload_path($stored, $type);
+    return $p !== '' && is_file($p);
+}
+
+/**
+ * رابط ملف مرفوع حسب نوعه، أو صورة افتراضية من DEFAULT_IMG_DIR إن لم يوجد.
+ * $fallback اسم ملف داخل مجلد الصور الافتراضية (مثل placeholder-news1.svg).
+ */
+function upload_url(?string $stored, string $type, string $fallback = 'no-image.svg'): string
+{
+    if ($stored !== null && preg_match('#^https?://#i', trim($stored))) {
+        return trim($stored); // رابط خارجي كامل
     }
-    return asset($fallback);
+    if (upload_exists($stored, $type)) {
+        return url(UPLOAD_URL . '/' . upload_dir($type) . '/' . rawurlencode(upload_name($stored)));
+    }
+    return asset(DEFAULT_IMG_DIR . '/' . $fallback);
 }
 
 /** CSRF: توليد توكن */
@@ -247,11 +282,11 @@ function normalize_url_input(string $url): string
 
 /**
  * @param string $field   اسم حقل الرفع في $_FILES
- * @param string $subdir  مجلد فرعي داخل uploads/ (products, news, team, slider, links, reports)
+ * @param string $type    نوع المحتوى — مفتاح في UPLOAD_DIRS (config.php) يحدد المجلد
  * @param array  $allowedMimes map: mime => extension allowed
- * @return array [ok(bool), pathOrError(string)]
+ * @return array [ok(bool), fileNameOrError(string)] — اسم الملف فقط بدون مسار
  */
-function upload_file(string $field, string $subdir, array $allowedMimes, int $maxSize = UPLOAD_MAX_SIZE): array
+function upload_file(string $field, string $type, array $allowedMimes, int $maxSize = UPLOAD_MAX_SIZE): array
 {
     if (empty($_FILES[$field]) || ($_FILES[$field]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         return [false, 'لم يتم اختيار ملف.'];
@@ -285,8 +320,7 @@ function upload_file(string $field, string $subdir, array $allowedMimes, int $ma
         }
     }
 
-    $safeDir = preg_replace('/[^a-z0-9_\-]/i', '', $subdir);
-    $dir = UPLOAD_PATH . '/' . $safeDir;
+    $dir = UPLOAD_PATH . '/' . upload_dir($type);
     if (!is_dir($dir)) {
         mkdir($dir, 0755, true);
     }
@@ -299,7 +333,7 @@ function upload_file(string $field, string $subdir, array $allowedMimes, int $ma
     }
     @chmod($dest, 0644);
 
-    return [true, 'uploads/' . $safeDir . '/' . $name];
+    return [true, $name]; // اسم الملف فقط — المجلد من UPLOAD_DIRS
 }
 
 const IMAGE_MIMES = [
@@ -367,13 +401,14 @@ function next_sort(string $table): int
     return (int)fetchValue("SELECT COALESCE(MAX(`$col`),0)+1 FROM `$table`") ;
 }
 
-/** حذف صورة قديمة من uploads إن كانت مسجلة هناك */
-function delete_upload(?string $relPath): void
+/** حذف ملف مرفوع قديم حسب نوعه (داخل مجلد الرفع فقط). */
+function delete_upload(?string $stored, string $type): void
 {
-    if (!$relPath) return;
-    if (!str_starts_with($relPath, 'uploads/')) return;
-    $full = realpath(ROOT_PATH . '/' . $relPath);
-    if ($full && str_starts_with($full, realpath(UPLOAD_PATH) ?: '')) {
+    $p = upload_path($stored, $type);
+    if ($p === '') return;
+    $full = realpath($p);
+    $root = realpath(UPLOAD_PATH);
+    if ($full && $root && str_starts_with($full, $root . DIRECTORY_SEPARATOR)) {
         @unlink($full);
     }
 }
@@ -401,6 +436,22 @@ function emit_security_headers(): void
    الافتراضي داكن، ويُحفظ اختيار الزائر في المتصفح (localStorage + Cookie).
    ========================================================================== */
 
+/** النمط الحالي: اختيار الزائر المحفوظ في الكوكي، وإلا DEFAULT_THEME من config.php. */
+function current_theme(): string
+{
+    $t = $_COOKIE['site_theme'] ?? '';
+    if ($t !== 'light' && $t !== 'dark') {
+        $t = DEFAULT_THEME === 'dark' ? 'dark' : 'light';
+    }
+    return $t;
+}
+
+/** صنف وسم <html>: يُطبَّق النمط من الخادم مباشرة فلا يظهر وميض حتى دون JavaScript. */
+function theme_html_class(): string
+{
+    return current_theme() === 'light' ? ' class="light"' : '';
+}
+
 /** سكربت يُوضع داخل <head> قبل ملفات CSS ليُطبَّق النمط قبل الرسم (بدون وميض). */
 function theme_head_script(): string
 {
@@ -409,8 +460,9 @@ function theme_head_script(): string
 (function () {
   var t = null;
   try { t = localStorage.getItem('site_theme'); } catch (e) {}
-  if (!t) { var m = document.cookie.match(/(?:^|; )site_theme=([^;]+)/); t = m ? m[1] : null; }
+  // الكوكي والنمط الافتراضي طبّقهما الخادم على وسم html؛ هنا نتبع localStorage إن اختلف
   if (t === 'light') document.documentElement.classList.add('light');
+  if (t === 'dark') document.documentElement.classList.remove('light');
   window.toggleTheme = function () {
     var isLight = document.documentElement.classList.toggle('light');
     var v = isLight ? 'light' : 'dark';
@@ -444,24 +496,30 @@ HTML;
 }
 
 /**
- * الشعار حسب النمط: logo.png للفاتح و logow.png للداكن (كما في البوابة).
+ * الشعار حسب النمط: LOGO_LIGHT للفاتح و LOGO_DARK للداكن (من config.php).
  * إن رفع المدير شعارًا مخصصًا من الإعدادات يُعرض هو في النمطين.
  */
 function brand_logo(string $alt, string $class = ''): string
 {
-    $custom = trim((string) setting('logo', ''));
+    $custom = (string) setting('logo', '');
     $cls = trim('brand-logo ' . $class);
-    if ($custom !== '' && $custom !== 'assets/img/logo.svg') {
-        return '<img class="' . e($cls) . '" src="' . e(upload_url($custom)) . '" alt="' . e($alt) . '">';
+    if (upload_exists($custom, 'logo')) {
+        return '<img class="' . e($cls) . '" src="' . e(upload_url($custom, 'logo')) . '" alt="' . e($alt) . '">';
     }
-    return '<img class="' . e($cls . ' logo-light') . '" src="' . e(asset('img/logo.png')) . '" alt="' . e($alt) . '" width="481" height="200">'
-         . '<img class="' . e($cls . ' logo-dark') . '" src="' . e(asset('img/logow.png')) . '" alt="' . e($alt) . '" width="492" height="200">';
+    $img = function (string $file, string $mode) use ($cls, $alt): string {
+        // الأبعاد من الملف نفسه حتى تبقى صحيحة لو استُبدل الشعار
+        $size = @getimagesize(ROOT_PATH . '/' . ASSETS_URL . '/' . DEFAULT_IMG_DIR . '/' . $file);
+        $wh = $size ? ' width="' . (int)$size[0] . '" height="' . (int)$size[1] . '"' : '';
+        return '<img class="' . e($cls . ' logo-' . $mode) . '" src="' . e(asset(DEFAULT_IMG_DIR . '/' . $file)) . '" alt="' . e($alt) . '"' . $wh . '>';
+    };
+    return $img(LOGO_LIGHT, 'light') . $img(LOGO_DARK, 'dark');
 }
 
 /** أيقونة الموقع (favicon) وأيقونة أجهزة Apple — نفس أيقونات البوابة. */
 function favicon_links(): string
 {
-    return '<link rel="icon" type="image/png" sizes="64x64" href="' . e(asset('img/favicon.png')) . '">' . "\n"
-         . '<link rel="shortcut icon" type="image/png" href="' . e(asset('img/favicon.png')) . '">' . "\n"
-         . '<link rel="apple-touch-icon" sizes="180x180" href="' . e(asset('img/apple-touch-icon.png')) . '">';
+    $fav = e(asset(DEFAULT_IMG_DIR . '/favicon.png'));
+    return '<link rel="icon" type="image/png" sizes="64x64" href="' . $fav . '">' . "\n"
+         . '<link rel="shortcut icon" type="image/png" href="' . $fav . '">' . "\n"
+         . '<link rel="apple-touch-icon" sizes="180x180" href="' . e(asset(DEFAULT_IMG_DIR . '/apple-touch-icon.png')) . '">';
 }

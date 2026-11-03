@@ -33,7 +33,7 @@ require ROOT_PATH . '/includes/header.php';
       <?php foreach ($execs as $m): ?>
         <li class="card person-card">
           <div class="avatar">
-            <img src="<?= e(upload_url($m['image'], 'img/placeholder-exec1.svg')) ?>" alt="صورة <?= e($m['name']) ?>" loading="lazy">
+            <img src="<?= e(upload_url($m['image'], 'executives', 'placeholder-exec1.svg')) ?>" alt="صورة <?= e($m['name']) ?>" loading="lazy">
           </div>
           <div class="card-body">
             <h3><?= e($m['name']) ?></h3>

@@ -30,7 +30,7 @@ require ROOT_PATH . '/includes/header.php';
           <a class="card" href="<?= e($l['url']) ?>" target="_blank" rel="noopener noreferrer"
              aria-label="<?= e($l['title']) ?> — يفتح في تبويب جديد">
             <div class="thumb" style="aspect-ratio:4/3;display:grid;place-items:center;background:var(--c-surface)">
-              <img src="<?= e(upload_url($l['image'], 'img/placeholder-site1.svg')) ?>" alt="<?= e($l['title']) ?>" loading="lazy"
+              <img src="<?= e(upload_url($l['image'], 'links', 'placeholder-site1.svg')) ?>" alt="<?= e($l['title']) ?>" loading="lazy"
                    style="max-height:110px;width:auto">
             </div>
             <div class="card-body">

@@ -49,7 +49,7 @@ require ROOT_PATH . '/includes/header.php';
 
 <div class="container section" style="padding-top:0">
   <article class="rich-content">
-    <img src="<?= e(upload_url($product['image'], 'img/placeholder-product1.svg')) ?>"
+    <img src="<?= e(upload_url($product['image'], 'products', 'placeholder-product1.svg')) ?>"
          alt="<?= e($product['title']) ?>" style="max-height:420px;margin-inline:auto;width:auto">
     <div class="content-block" style="margin-top:1.6rem">
       <?= clean_html($product['content_html']) ?>
