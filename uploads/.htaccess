@@ -1,14 +1,27 @@
-# منع تنفيذ PHP داخل مجلد الرفع
-php_flag engine off
+# =====================================================================
+# حماية مجلد الرفع: الملفات هنا تُعرض فقط ولا تُنفَّذ أبدًا.
+# يعمل مع PHP كوحدة Apache (mod_php) ومع PHP-FPM (الشائع في الاستضافات).
+# ملاحظة: «php_flag» وحده يسبب خطأ 500 لكل ملفات المجلد عند استخدام
+# PHP-FPM، لذا يوضع داخل IfModule فلا يُقرأ إلا إن كان mod_php مُفعّلًا.
+# =====================================================================
+
 Options -Indexes -ExecCGI
+
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+
+# منع طلب أي ملف قابل للتنفيذ (يعمل مع كل طرق تشغيل PHP)
+<FilesMatch "\.(php[0-9]?|phar|phtml|pl|py|cgi|sh)$">
+  Require all denied
+</FilesMatch>
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule \.php[0-9]?$ - [F,L,NC]
+  RewriteRule \.(php[0-9]?|phar|phtml)$ - [F,L,NC]
 </IfModule>
-
-<FilesMatch "\.(php|phar|phtml|pl|py|cgi|sh)$">
-  Require all denied
-</FilesMatch>
 
 AddType text/plain .php .phtml .phar
