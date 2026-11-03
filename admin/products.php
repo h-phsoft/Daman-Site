@@ -16,7 +16,7 @@ unset($FIELDS[3]); // المحتوى عبر editor.php
 $LIST_COLS = function (string $mode, ?array $r = null) {
     if ($mode === 'head') return ['المنتج', 'الصورة', 'وصف مختصر'];
     $out = [e((string)($r['title'] ?? ''))];
-    $out[] = !empty($r['image']) ? '<img class="row-thumb" src="' . e(upload_url($r['image'], 'products')) . '" alt="">' : '—';
+    $out[] = admin_thumb($r['image'] ?? null, 'products');
     $d = mb_substr(strip_tags((string)($r['short_desc'] ?? '')), 0, 60);
     $out[] = e($d);
     return $out;

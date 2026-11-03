@@ -16,7 +16,7 @@ $LIST_COLS = function (string $mode, ?array $r = null) {
     return [
         e((string)($r['name'] ?? '')),
         e((string)($r['position'] ?? '')),
-        !empty($r['image']) ? '<img class="row-thumb" src="' . e(upload_url($r['image'], 'board')) . '" alt="">' : '—',
+        admin_thumb($r['image'] ?? null, 'board'),
         !empty($r['bio_html']) ? '<a href="' . e(url('admin/editor.php?table=board_members&col=bio_html&id=' . (int)$r['id'])) . '">تحرير النبذة ↗</a>' : '<span style="color:var(--c-muted)">—</span>',
     ];
 };

@@ -16,7 +16,7 @@ $LIST_COLS = function (string $mode, ?array $r = null) {
     if ($mode === 'head') return ['التقرير', 'الملف', 'التاريخ'];
     return [
         e((string)($r['title'] ?? '')),
-        !empty($r['file_path']) ? '<a href="' . e(upload_url((string)$r['file_path'], 'reports')) . '" target="_blank" rel="noopener">PDF ↗</a>' : '—',
+        admin_file_link($r['file_path'] ?? null, 'reports'),
         e(ar_date((string)($r['publish_date'] ?? ''))),
     ];
 };
