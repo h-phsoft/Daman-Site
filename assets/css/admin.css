@@ -7,7 +7,8 @@ body.admin-body { background: var(--c-bg); }
 }
 .admin-side .brand-mini { display:flex; gap:.6rem; align-items:center; padding:.4rem .5rem 1rem; border-bottom:1px solid var(--c-line); margin-bottom:.8rem; }
 .admin-side .brand-mini img { width:auto; height:40px; }
-.admin-side .brand-mini strong { color:var(--c-heading); font-size:.95rem; line-height:1.3; }
+/* الاسم مخفي بصريًا (الشعار يحمله) ويبقى لقارئات الشاشة */
+.admin-side .brand-mini strong { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 .admin-side nav ul { list-style:none; margin:0; padding:0; display:grid; gap:.25rem; }
 .admin-side nav a { display:flex; align-items:center; gap:.6rem; color:var(--c-muted); padding:.6rem .8rem; border-radius:8px; font-size:.9rem; font-weight:600; }
 .admin-side nav a:hover { background:var(--c-surface-hover); color:var(--c-heading); }
