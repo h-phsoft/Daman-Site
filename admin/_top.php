@@ -70,7 +70,7 @@ $navItems = [
         <li role="none"><a href="<?= url('') ?>" target="_blank" rel="noopener">
           <svg width="16" height="16" aria-hidden="true"><use href="<?= asset('vendor/icons/ui.svg#external') ?>"></use></svg>
           عرض الموقع</a></li>
-        <li role="none"><a href="<?= url('admin/logout.php') ?>" style="color:#f2b632">
+        <li role="none"><a href="<?= url('admin/logout.php') ?>" style="color:var(--c-primary-light)">
           <svg width="16" height="16" aria-hidden="true"><use href="<?= asset('vendor/icons/ui.svg#logout') ?>"></use></svg>
           تسجيل الخروج (<?= e($u['username'] ?? '') ?>)</a></li>
       </ul>
