@@ -436,6 +436,22 @@ function emit_security_headers(): void
    الافتراضي داكن، ويُحفظ اختيار الزائر في المتصفح (localStorage + Cookie).
    ========================================================================== */
 
+/** النمط الحالي: اختيار الزائر المحفوظ في الكوكي، وإلا DEFAULT_THEME من config.php. */
+function current_theme(): string
+{
+    $t = $_COOKIE['site_theme'] ?? '';
+    if ($t !== 'light' && $t !== 'dark') {
+        $t = DEFAULT_THEME === 'dark' ? 'dark' : 'light';
+    }
+    return $t;
+}
+
+/** صنف وسم <html>: يُطبَّق النمط من الخادم مباشرة فلا يظهر وميض حتى دون JavaScript. */
+function theme_html_class(): string
+{
+    return current_theme() === 'light' ? ' class="light"' : '';
+}
+
 /** سكربت يُوضع داخل <head> قبل ملفات CSS ليُطبَّق النمط قبل الرسم (بدون وميض). */
 function theme_head_script(): string
 {
@@ -444,8 +460,9 @@ function theme_head_script(): string
 (function () {
   var t = null;
   try { t = localStorage.getItem('site_theme'); } catch (e) {}
-  if (!t) { var m = document.cookie.match(/(?:^|; )site_theme=([^;]+)/); t = m ? m[1] : null; }
+  // الكوكي والنمط الافتراضي طبّقهما الخادم على وسم html؛ هنا نتبع localStorage إن اختلف
   if (t === 'light') document.documentElement.classList.add('light');
+  if (t === 'dark') document.documentElement.classList.remove('light');
   window.toggleTheme = function () {
     var isLight = document.documentElement.classList.toggle('light');
     var v = isLight ? 'light' : 'dark';
@@ -479,7 +496,7 @@ HTML;
 }
 
 /**
- * الشعار حسب النمط: logo.png للفاتح و logow.png للداكن (كما في البوابة).
+ * الشعار حسب النمط: LOGO_LIGHT للفاتح و LOGO_DARK للداكن (من config.php).
  * إن رفع المدير شعارًا مخصصًا من الإعدادات يُعرض هو في النمطين.
  */
 function brand_logo(string $alt, string $class = ''): string
@@ -489,8 +506,13 @@ function brand_logo(string $alt, string $class = ''): string
     if (upload_exists($custom, 'logo')) {
         return '<img class="' . e($cls) . '" src="' . e(upload_url($custom, 'logo')) . '" alt="' . e($alt) . '">';
     }
-    return '<img class="' . e($cls . ' logo-light') . '" src="' . e(asset(DEFAULT_IMG_DIR . '/logo.png')) . '" alt="' . e($alt) . '" width="481" height="200">'
-         . '<img class="' . e($cls . ' logo-dark') . '" src="' . e(asset(DEFAULT_IMG_DIR . '/logow.png')) . '" alt="' . e($alt) . '" width="492" height="200">';
+    $img = function (string $file, string $mode) use ($cls, $alt): string {
+        // الأبعاد من الملف نفسه حتى تبقى صحيحة لو استُبدل الشعار
+        $size = @getimagesize(ROOT_PATH . '/' . ASSETS_URL . '/' . DEFAULT_IMG_DIR . '/' . $file);
+        $wh = $size ? ' width="' . (int)$size[0] . '" height="' . (int)$size[1] . '"' : '';
+        return '<img class="' . e($cls . ' logo-' . $mode) . '" src="' . e(asset(DEFAULT_IMG_DIR . '/' . $file)) . '" alt="' . e($alt) . '"' . $wh . '>';
+    };
+    return $img(LOGO_LIGHT, 'light') . $img(LOGO_DARK, 'dark');
 }
 
 /** أيقونة الموقع (favicon) وأيقونة أجهزة Apple — نفس أيقونات البوابة. */
