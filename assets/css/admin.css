@@ -40,6 +40,8 @@ table.data img.row-thumb { width:56px; height:40px; object-fit:cover; border-rad
 .login-card .logo-center img { width:auto; height:80px; }
 .logo-preview { display:inline-flex; background:var(--c-surface); border-radius:8px; padding:8px; border:1px solid var(--c-line); }
 .logo-preview img { width:auto; height:60px; }
+.logo-preview.on-dark { background:#1A1A1D; border-color:#333338; } /* معاينة شعار النمط الداكن على خلفية داكنة دائمًا */
+.logo-preview.is-icon img { height:48px; }
 .toolbar-forms { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; margin-bottom:1rem; }
 .inline-form { display:inline; }
 .tox-tinymce { border-radius:9px !important; }
