@@ -34,7 +34,7 @@ require ROOT_PATH . '/includes/header.php';
       <?php foreach ($members as $m): ?>
         <li class="card person-card">
           <div class="avatar">
-            <img src="<?= e(upload_url($m['image'], 'img/placeholder-member1.svg')) ?>" alt="صورة <?= e($m['name']) ?>" loading="lazy">
+            <img src="<?= e(upload_url($m['image'], 'board', 'placeholder-member1.svg')) ?>" alt="صورة <?= e($m['name']) ?>" loading="lazy">
           </div>
           <div class="card-body">
             <h3><?= e($m['name']) ?></h3>

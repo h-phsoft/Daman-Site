@@ -28,7 +28,7 @@ require ROOT_PATH . '/includes/header.php';
       <?php foreach ($products as $p): ?>
         <article class="content-block" aria-labelledby="prod-<?= (int)$p['id'] ?>">
           <div style="display:flex;gap:1.4rem;flex-wrap:wrap;align-items:flex-start">
-            <img src="<?= e(upload_url($p['image'], 'img/placeholder-product1.svg')) ?>"
+            <img src="<?= e(upload_url($p['image'], 'products', 'placeholder-product1.svg')) ?>"
                  alt="<?= e($p['title']) ?>" loading="lazy"
                  style="width:230px;height:150px;object-fit:cover;border-radius:12px;box-shadow:var(--shadow)">
             <div style="flex:1;min-width:260px">

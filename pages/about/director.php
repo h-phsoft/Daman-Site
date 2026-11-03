@@ -21,7 +21,7 @@ render_sections_intro($data, 'رسالة المدير العام إلى زوار
         <section class="content-block" aria-labelledby="dir-<?= (int)$sec['id'] ?>">
           <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
             <?php if (!empty($sec['image'])): ?>
-              <img src="<?= e(upload_url($sec['image'], 'img/placeholder-director.svg')) ?>"
+              <img src="<?= e(upload_url($sec['image'], 'sections', 'placeholder-director.svg')) ?>"
                    alt="صورة <?= e($sec['title']) ?>"
                    style="width:200px;height:200px;object-fit:cover;border-radius:50%;border:5px solid var(--c-primary-light);box-shadow:var(--shadow)"
                    loading="lazy">

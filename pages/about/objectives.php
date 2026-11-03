@@ -23,7 +23,7 @@ render_sections_intro($data, 'تعرف على نشأة الصندوق ورؤيت
         <section class="content-block" aria-labelledby="obj-<?= (int)$sec['id'] ?>">
           <h2 id="obj-<?= (int)$sec['id'] ?>"><?= e($sec['title']) ?></h2>
           <?php if (!empty($sec['image'])): ?>
-            <img src="<?= e(upload_url($sec['image'], 'img/no-image.svg')) ?>" alt="<?= e($sec['title']) ?>" loading="lazy">
+            <img src="<?= e(upload_url($sec['image'], 'sections', 'no-image.svg')) ?>" alt="<?= e($sec['title']) ?>" loading="lazy">
           <?php endif; ?>
           <?= clean_html($sec['content_html']) ?>
         </section>

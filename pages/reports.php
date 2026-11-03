@@ -27,7 +27,7 @@ require ROOT_PATH . '/includes/header.php';
     <ul class="grid grid-3" role="list" style="list-style:none;padding:0;margin:0" aria-label="قائمة التقارير السنوية">
       <?php foreach ($reports as $r):
           // التحقق من وجود الملف فعليًا قبل عرض الرابط (منع كسر الروابط)
-          $fileExists = is_file(ROOT_PATH . '/' . $r['file_path']);
+          $fileExists = upload_exists($r['file_path'], 'reports');
       ?>
         <li class="card">
           <div class="card-body" style="gap:.7rem">
@@ -38,7 +38,7 @@ require ROOT_PATH . '/includes/header.php';
             <h3><?= e($r['title']) ?></h3>
             <p class="desc"><time datetime="<?= e($r['publish_date']) ?>"><?= e(ar_date($r['publish_date'])) ?></time></p>
             <?php if ($fileExists): ?>
-              <a class="btn btn-primary btn-sm" href="<?= e(url($r['file_path'])) ?>" download target="_blank" rel="noopener">تحميل التقرير</a>
+              <a class="btn btn-primary btn-sm" href="<?= e(upload_url($r['file_path'], 'reports')) ?>" download target="_blank" rel="noopener">تحميل التقرير</a>
             <?php else: ?>
               <span class="badge badge-off">الملف غير متوفر حاليًا</span>
             <?php endif; ?>

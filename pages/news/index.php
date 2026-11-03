@@ -41,7 +41,7 @@ require ROOT_PATH . '/includes/header.php';
     ?>
       <article class="news-row">
         <a class="thumb" href="<?= url('pages/news/article.php?slug=' . urlencode($n['slug'])) ?>" aria-hidden="true" tabindex="-1">
-          <img src="<?= e(upload_url($n['image'], 'img/placeholder-news1.svg')) ?>" alt="" loading="lazy">
+          <img src="<?= e(upload_url($n['image'], 'news', 'placeholder-news1.svg')) ?>" alt="" loading="lazy">
         </a>
         <div style="flex:1">
           <span class="meta-date" style="color:var(--c-accent-dark);font-size:.82rem;font-weight:600">

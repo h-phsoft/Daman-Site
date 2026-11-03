@@ -52,7 +52,7 @@ if (!isset($LIST_COLS)) {
         }
         $out = [];
         if ($imgCol && !empty($r[$imgCol['name']])) {
-            $out[] = '<img class="row-thumb" src="' . e(upload_url($r[$imgCol['name']])) . '" alt="">';
+            $out[] = '<img class="row-thumb" src="' . e(upload_url($r[$imgCol['name']], $imgCol['upload'])) . '" alt="">';
         } elseif ($imgCol) {
             $out[] = '—';
         }

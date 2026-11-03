@@ -22,7 +22,7 @@ require ROOT_PATH . '/includes/header.php';
     <?php foreach ($slides as $i => $s): ?>
       <article class="slide<?= $i === 0 ? ' is-active' : '' ?>" role="group" aria-roledescription="slide"
                aria-label="شريحة <?= $i + 1 ?> من <?= count($slides) ?>" aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>">
-        <img class="cover" src="<?= e(upload_url($s['image'], 'img/slide1.svg')) ?>" alt="<?= e($s['title'] ?: 'صورة ترويجية') ?>">
+        <img class="cover" src="<?= e(upload_url($s['image'], 'slider', 'slide1.svg')) ?>" alt="<?= e($s['title'] ?: 'صورة ترويجية') ?>">
         <div class="slide-overlay">
           <!-- Overlay بخلفية دخانية شفافة مع Blur -->
           <div class="overlay-glass">
@@ -57,7 +57,7 @@ require ROOT_PATH . '/includes/header.php';
       <?php foreach ($products as $p): ?>
         <article class="card">
           <div class="thumb">
-            <img src="<?= e(upload_url($p['image'], 'img/placeholder-product1.svg')) ?>" alt="<?= e($p['title']) ?>" loading="lazy">
+            <img src="<?= e(upload_url($p['image'], 'products', 'placeholder-product1.svg')) ?>" alt="<?= e($p['title']) ?>" loading="lazy">
           </div>
           <div class="card-body">
             <h3><?= e($p['title']) ?></h3>
@@ -89,7 +89,7 @@ require ROOT_PATH . '/includes/header.php';
     ?>
       <article class="news-row">
         <a class="thumb" href="<?= $newsUrl ?>" aria-hidden="true" tabindex="-1">
-          <img src="<?= e(upload_url($n['image'], 'img/placeholder-news1.svg')) ?>" alt="" loading="lazy">
+          <img src="<?= e(upload_url($n['image'], 'news', 'placeholder-news1.svg')) ?>" alt="" loading="lazy">
         </a>
         <div style="flex:1">
           <span class="meta-date" style="color:var(--c-accent-dark);font-size:.82rem;font-weight:600">

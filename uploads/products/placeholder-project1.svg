@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1A1A1D"/><stop offset="1" stop-color="#8A0000"/></linearGradient></defs>
+<rect width="800" height="500" fill="url(#g)"/>
+<g fill="#ffffff" opacity=".92"><path d="M400 150 l90 70 v120 h-60 v-70 h-60 v70 h-60 v-120 z"/></g>
+<text x="400" y="420" font-family="Tahoma, sans-serif" font-size="34" fill="#ffffff" text-anchor="middle">مشروع 1</text>
+</svg>

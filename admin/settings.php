@@ -47,11 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         // رفع الشعار
         if (!empty($_FILES['upload_logo']['name'])) {
-            [$ok, $res] = upload_file('upload_logo', 'img', IMAGE_MIMES);
+            [$ok, $res] = upload_file('upload_logo', 'logo', IMAGE_MIMES);
             if ($ok) {
                 $old = setting('logo');
                 set_setting('logo', $res);
-                if (str_starts_with($old, 'uploads/')) delete_upload($old);
+                if ($old !== '') delete_upload($old, 'logo');
                 flash_set('success', 'تم تحديث الشعار.');
             } else {
                 flash_set('error', 'الشعار: ' . $res);

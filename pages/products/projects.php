@@ -28,7 +28,7 @@ require ROOT_PATH . '/includes/header.php';
       <?php foreach ($projects as $pr): ?>
         <article class="content-block" aria-labelledby="proj-<?= (int)$pr['id'] ?>">
           <div style="display:flex;gap:1.4rem;flex-wrap:wrap;align-items:flex-start">
-            <img src="<?= e(upload_url($pr['image'], 'img/placeholder-project1.svg')) ?>"
+            <img src="<?= e(upload_url($pr['image'], 'projects', 'placeholder-project1.svg')) ?>"
                  alt="<?= e($pr['title']) ?>" loading="lazy"
                  style="width:230px;height:150px;object-fit:cover;border-radius:12px;box-shadow:var(--shadow)">
             <div style="flex:1;min-width:260px">

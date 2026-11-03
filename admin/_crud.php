@@ -36,7 +36,7 @@ function admin_handle_crud(string $table, array $fields, string $redirect): void
         if ($row) {
             foreach ($fields as $f) {
                 if (in_array($f['type'], ['image', 'file'], true) && !empty($row[$f['name']])) {
-                    delete_upload((string)$row[$f['name']]);
+                    delete_upload((string)$row[$f['name']], $f['upload']);
                 }
             }
             q("DELETE FROM `$table` WHERE id = ?", [$id]);
@@ -53,15 +53,15 @@ function admin_handle_crud(string $table, array $fields, string $redirect): void
         foreach ($fields as $f) {
             $name = $f['name'];
             if ($f['type'] === 'image' || $f['type'] === 'file') {
-                $keep = trim((string)($_POST['keep_' . $name] ?? ''));
+                $keep = upload_name($_POST['keep_' . $name] ?? ''); // اسم الملف فقط
                 $fieldKey = 'upload_' . $name;
                 if (!empty($_FILES[$fieldKey]['name'])) {
                     $mimes = $f['type'] === 'file' ? FILE_MIMES_REPORTS : IMAGE_MIMES;
-                    [$ok, $res] = upload_file($fieldKey, $f['dir'] ?? $table, $mimes);
+                    [$ok, $res] = upload_file($fieldKey, $f['upload'], $mimes);
                     if (!$ok) {
                         $errs[$name] = $res;
                     } else {
-                        if (strpos($keep, 'uploads/') === 0) delete_upload($keep);
+                        if ($keep !== '') delete_upload($keep, $f['upload']);
                         $data[$name] = $res;
                     }
                 } else {
@@ -170,9 +170,9 @@ function admin_render_form(string $table, array $fields, ?array $row, string $re
             <?php if ($isEdit && $val): ?>
               <div style="display:flex;gap:.6rem;align-items:center;margin-bottom:.4rem">
                 <?php if ($f['type'] === 'image'): ?>
-                  <img src="<?= e(upload_url((string)$val)) ?>" alt="" style="width:74px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--c-line)">
+                  <img src="<?= e(upload_url((string)$val, $f['upload'])) ?>" alt="" style="width:74px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--c-line)">
                 <?php else: ?>
-                  <a href="<?= e(url((string)$val)) ?>" target="_blank" rel="noopener">الملف الحالي ↗</a>
+                  <a href="<?= e(upload_url((string)$val, $f['upload'])) ?>" target="_blank" rel="noopener">الملف الحالي ↗</a>
                 <?php endif; ?>
                 <label style="margin:0;font-weight:500;display:inline-flex;gap:.3rem;align-items:center">
                   <input type="checkbox" name="keep_<?= e($name) ?>" value="<?= e((string)$val) ?>" checked> إبقاء الحالي

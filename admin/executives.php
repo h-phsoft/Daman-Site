@@ -8,7 +8,7 @@ $TITLE_SINGULAR = 'تنفيذي';
 $FIELDS = [
     ['name' => 'name', 'label' => 'الاسم', 'type' => 'text'],
     ['name' => 'position', 'label' => 'الصفة / المنصب', 'type' => 'text', 'nullable' => true],
-    ['name' => 'image', 'label' => 'الصورة الشخصية', 'type' => 'image', 'dir' => 'team', 'nullable' => true],
+    ['name' => 'image', 'label' => 'الصورة الشخصية', 'type' => 'image', 'upload' => 'executives', 'nullable' => true],
     ['name' => 'is_active', 'label' => 'الحالة', 'type' => 'checkbox', 'default' => 1],
 ];
 $LIST_COLS = function (string $mode, ?array $r = null) {
@@ -16,7 +16,7 @@ $LIST_COLS = function (string $mode, ?array $r = null) {
     return [
         e((string)($r['name'] ?? '')),
         e((string)($r['position'] ?? '')),
-        !empty($r['image']) ? '<img class="row-thumb" src="' . e(upload_url($r['image'])) . '" alt="">' : '—',
+        !empty($r['image']) ? '<img class="row-thumb" src="' . e(upload_url($r['image'], 'executives')) . '" alt="">' : '—',
         !empty($r['bio_html']) ? '<a href="' . e(url('admin/editor.php?table=executives&col=bio_html&id=' . (int)$r['id'])) . '">تحرير النبذة ↗</a>' : '<span style="color:var(--c-muted)">—</span>',
     ];
 };
