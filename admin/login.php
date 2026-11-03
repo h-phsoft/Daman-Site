@@ -40,7 +40,7 @@ $siteName = setting('site_name', 'الصندوق');
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>تسجيل الدخول | إدارة <?= e($siteName) ?></title>
-<link rel="icon" type="image/svg+xml" href="<?= e(asset('img/logo.svg')) ?>">
+<?= favicon_links() ?>
 <?= theme_head_script() ?>
 <link rel="stylesheet" href="<?= asset('vendor/fonts/fonts.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
@@ -49,7 +49,7 @@ $siteName = setting('site_name', 'الصندوق');
 <body class="login-wrap">
   <?= theme_toggle_button() ?>
   <main class="login-card" id="main-content" aria-labelledby="loginTitle">
-    <img class="logo-center" src="<?= e(upload_url(setting('logo') ?: null, 'img/logo.svg')) ?>" alt="شعار <?= e($siteName) ?>" width="74" height="74">
+    <div class="logo-center"><?= brand_logo('شعار ' . $siteName) ?></div>
     <h1 id="loginTitle" style="text-align:center;font-size:1.25rem">دخول لوحة التحكم</h1>
     <p style="text-align:center;color:var(--c-muted);font-size:.88rem;margin-top:0"><?= e($siteName) ?></p>
 

@@ -442,3 +442,26 @@ function theme_toggle_button(): string
 </button>
 HTML;
 }
+
+/**
+ * الشعار حسب النمط: logo.png للفاتح و logow.png للداكن (كما في البوابة).
+ * إن رفع المدير شعارًا مخصصًا من الإعدادات يُعرض هو في النمطين.
+ */
+function brand_logo(string $alt, string $class = ''): string
+{
+    $custom = trim((string) setting('logo', ''));
+    $cls = trim('brand-logo ' . $class);
+    if ($custom !== '' && $custom !== 'assets/img/logo.svg') {
+        return '<img class="' . e($cls) . '" src="' . e(upload_url($custom)) . '" alt="' . e($alt) . '">';
+    }
+    return '<img class="' . e($cls . ' logo-light') . '" src="' . e(asset('img/logo.png')) . '" alt="' . e($alt) . '" width="481" height="200">'
+         . '<img class="' . e($cls . ' logo-dark') . '" src="' . e(asset('img/logow.png')) . '" alt="' . e($alt) . '" width="492" height="200">';
+}
+
+/** أيقونة الموقع (favicon) وأيقونة أجهزة Apple — نفس أيقونات البوابة. */
+function favicon_links(): string
+{
+    return '<link rel="icon" type="image/png" sizes="64x64" href="' . e(asset('img/favicon.png')) . '">' . "\n"
+         . '<link rel="shortcut icon" type="image/png" href="' . e(asset('img/favicon.png')) . '">' . "\n"
+         . '<link rel="apple-touch-icon" sizes="180x180" href="' . e(asset('img/apple-touch-icon.png')) . '">';
+}

@@ -16,7 +16,6 @@ function admin_footer(): void
 $u = current_user();
 $adminTitle  = $ADMIN_TITLE ?? 'لوحة التحكم';
 $adminActive = $ADMIN_ACTIVE ?? '';
-$logoPath    = setting('logo', 'assets/img/logo.svg');
 
 $navItems = [
     'index'      => ['الرئيسية (Dashboard)', 'grid'],
@@ -41,7 +40,7 @@ $navItems = [
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title><?= e($adminTitle) ?> | إدارة <?= e(setting('site_name', 'الصندوق')) ?></title>
-<link rel="icon" type="image/svg+xml" href="<?= e(upload_url($logoPath ?: null, 'img/logo.svg')) ?>">
+<?= favicon_links() ?>
 <?= theme_head_script() ?>
 <link rel="stylesheet" href="<?= asset('vendor/fonts/fonts.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
@@ -53,7 +52,7 @@ $navItems = [
 <div class="admin-shell">
   <aside class="admin-side">
     <a class="brand-mini" href="<?= url('admin/') ?>">
-      <img src="<?= e(upload_url($logoPath ?: null, 'img/logo.svg')) ?>" alt="الشعار">
+      <?= brand_logo('الشعار') ?>
       <strong>إدارة<br><?= e(setting('site_name', 'الصندوق')) ?></strong>
     </a>
     <nav aria-label="قائمة لوحة التحكم">
