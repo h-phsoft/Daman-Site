@@ -8,7 +8,7 @@
       base_url: '/assets/vendor/tinymce',
       suffix: '.min',
       rtl: true,
-      skin: 'oxide-dark',
+      skin: document.documentElement.classList.contains('light') ? 'oxide' : 'oxide-dark',
       promotion: false,
       branding: false,
       height: 380,

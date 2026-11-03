@@ -395,3 +395,50 @@ function emit_security_headers(): void
         "connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
     );
 }
+
+/* ==========================================================================
+   النمط الفاتح / الداكن — بنفس أسلوب بوابة LRGC
+   الافتراضي داكن، ويُحفظ اختيار الزائر في المتصفح (localStorage + Cookie).
+   ========================================================================== */
+
+/** سكربت يُوضع داخل <head> قبل ملفات CSS ليُطبَّق النمط قبل الرسم (بدون وميض). */
+function theme_head_script(): string
+{
+    return <<<'HTML'
+<script>
+(function () {
+  var t = null;
+  try { t = localStorage.getItem('site_theme'); } catch (e) {}
+  if (!t) { var m = document.cookie.match(/(?:^|; )site_theme=([^;]+)/); t = m ? m[1] : null; }
+  if (t === 'light') document.documentElement.classList.add('light');
+  window.toggleTheme = function () {
+    var isLight = document.documentElement.classList.toggle('light');
+    var v = isLight ? 'light' : 'dark';
+    try { localStorage.setItem('site_theme', v); } catch (e) {}
+    document.cookie = 'site_theme=' + v + ';path=/;max-age=31536000;SameSite=Lax';
+    document.querySelectorAll('.theme-toggle').forEach(function (b) {
+      b.setAttribute('aria-pressed', isLight ? 'false' : 'true');
+    });
+  };
+  document.addEventListener('DOMContentLoaded', function () {
+    var dark = !document.documentElement.classList.contains('light');
+    document.querySelectorAll('.theme-toggle').forEach(function (b) {
+      b.setAttribute('aria-pressed', dark ? 'true' : 'false');
+      b.addEventListener('click', window.toggleTheme);
+    });
+  });
+})();
+</script>
+HTML;
+}
+
+/** زر التبديل: قمر في النمط الداكن، شمس في النمط الفاتح. */
+function theme_toggle_button(): string
+{
+    return <<<'HTML'
+<button type="button" class="theme-toggle" aria-pressed="true" aria-label="النمط الداكن" title="تبديل النمط فاتح / داكن">
+  <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+  <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+</button>
+HTML;
+}
