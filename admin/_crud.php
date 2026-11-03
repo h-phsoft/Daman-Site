@@ -289,6 +289,14 @@ function admin_missing_badge(?string $stored, string $type): string
          . '<small dir="ltr">' . e($path) . '</small></span>';
 }
 
+/** حالة حقل نص منسّق في القوائم: «✓ موجود» أو «فارغ». يُحرَّر من نموذج التعديل نفسه. */
+function admin_text_status(?string $html): string
+{
+    $hasText = trim(html_entity_decode(strip_tags((string)$html), ENT_QUOTES, 'UTF-8')) !== ''
+            || preg_match('#<(img|table|iframe)#i', (string)$html);
+    return $hasText ? '<span class="badge badge-on">✓ موجود</span>' : '<span class="badge badge-off">فارغ</span>';
+}
+
 /** صورة مصغرة لقوائم لوحة التحكم: «—» إن لم تُسجَّل صورة، وتنبيه إن كان ملفها مفقودًا. */
 function admin_thumb(?string $stored, string $type): string
 {

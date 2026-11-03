@@ -9,6 +9,7 @@ $FIELDS = [
     ['name' => 'name', 'label' => 'الاسم', 'type' => 'text'],
     ['name' => 'position', 'label' => 'الصفة / المنصب', 'type' => 'text', 'nullable' => true],
     ['name' => 'image', 'label' => 'الصورة الشخصية', 'type' => 'image', 'upload' => 'board', 'nullable' => true],
+    ['name' => 'bio_html', 'label' => 'النبذة', 'type' => 'html', 'nullable' => true],
     ['name' => 'is_active', 'label' => 'الحالة', 'type' => 'checkbox', 'default' => 1],
 ];
 $LIST_COLS = function (string $mode, ?array $r = null) {
@@ -17,7 +18,7 @@ $LIST_COLS = function (string $mode, ?array $r = null) {
         e((string)($r['name'] ?? '')),
         e((string)($r['position'] ?? '')),
         admin_thumb($r['image'] ?? null, 'board'),
-        !empty($r['bio_html']) ? '<a href="' . e(url('admin/editor.php?table=board_members&col=bio_html&id=' . (int)$r['id'])) . '">تحرير النبذة ↗</a>' : '<span style="color:var(--c-muted)">—</span>',
+        admin_text_status($r['bio_html'] ?? null),
     ];
 };
 require __DIR__ . '/_list_page.php';
