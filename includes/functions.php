@@ -366,6 +366,15 @@ const SORTABLE_TABLES = [
     'slider'          => ['col_sort' => 'sort_order', 'col_id' => 'id'],
 ];
 
+/** جداول تُدار من لوحة التحكم دون ترتيب يدوي (تُرتَّب بالتاريخ) */
+const UNSORTED_CRUD_TABLES = ['news'];
+
+/** هل يُسمح بإدارة هذا الجدول عبر admin_handle_crud؟ */
+function crud_table_allowed(string $table): bool
+{
+    return isset(SORTABLE_TABLES[$table]) || in_array($table, UNSORTED_CRUD_TABLES, true);
+}
+
 function move_item(string $table, int $id, string $direction): bool
 {
     if (!isset(SORTABLE_TABLES[$table])) return false;
