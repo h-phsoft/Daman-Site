@@ -21,7 +21,7 @@ function admin_handle_crud(string $table, array $fields, string $redirect): void
 {
     csrf_require();
 
-    if (!isset(SORTABLE_TABLES[$table])) {
+    if (!crud_table_allowed($table)) {
         flash_set('error', 'جدول غير مسموح.');
         header('Location: ' . url('admin/' . $redirect));
         exit;
@@ -118,11 +118,19 @@ function admin_handle_crud(string $table, array $fields, string $redirect): void
             q("UPDATE `$table` SET " . implode(', ', $sets) . " WHERE id = ?", $params);
             flash_set('success', 'تم تحديث العنصر.');
         } else {
-            $data['sort_order'] = next_sort($table);
+            if (isset(SORTABLE_TABLES[$table])) {
+                $data['sort_order'] = next_sort($table);
+            }
+            if ($table === 'news') {
+                // رابط الخبر يُولَّد من العنوان مرة واحدة ويبقى ثابتًا عند التعديل
+                $data['slug'] = unique_news_slug((string)($data['title'] ?? ''));
+            }
             $cols = array_keys($data);
             $sql = "INSERT INTO `$table` (`" . implode('`, `', $cols) . "`) VALUES (" . rtrim(str_repeat('?, ', count($cols)), ', ') . ')';
             q($sql, array_values($data));
-            flash_set('success', 'تمت الإضافة بنجاح.');
+            flash_set('success', $table === 'news'
+                ? 'تمت إضافة الخبر. أضف المقتطف ونص الخبر من روابط «المقتطف» و«المحتوى» في القائمة.'
+                : 'تمت الإضافة بنجاح.');
         }
     }
 
@@ -208,11 +216,12 @@ function admin_render_form(string $table, array $fields, ?array $row, string $re
 /** عرض جدول القائمة مع أزرار الترتيب والتعديل والحذف */
 function admin_render_list(string $table, array $rows, callable $colsFn, string $redirect): void
 {
+    $sortable = isset(SORTABLE_TABLES[$table]);
     ?>
 <div class="table-wrap">
   <table class="data">
     <thead><tr>
-      <th>الترتيب</th>
+      <?php if ($sortable): ?><th>الترتيب</th><?php endif; ?>
       <?php foreach ($colsFn('head') as $h): ?><th><?= e($h) ?></th><?php endforeach; ?>
       <th>الحالة</th>
       <th aria-label="إجراءات">إجراءات</th>
@@ -223,6 +232,7 @@ function admin_render_list(string $table, array $rows, callable $colsFn, string 
     <?php endif; ?>
     <?php foreach ($rows as $r): ?>
       <tr>
+        <?php if ($sortable): ?>
         <td style="white-space:nowrap">
           <form class="inline-form" method="post" action="<?= url('admin/' . $redirect) ?>"><?= csrf_field() ?>
             <input type="hidden" name="action" value="move"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>"><input type="hidden" name="dir" value="up">
@@ -233,6 +243,7 @@ function admin_render_list(string $table, array $rows, callable $colsFn, string 
             <button class="btn-icon" type="submit" title="لأسفل" aria-label="نقل لأسفل">▼</button>
           </form>
         </td>
+        <?php endif; ?>
         <?php foreach ($colsFn('row', $r) as $c): ?>
           <td><?= $c /* مُهيّأ مسبقًا عبر e() في المستدعي */ ?></td>
         <?php endforeach; ?>

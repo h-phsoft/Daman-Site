@@ -246,7 +246,13 @@ INSERT INTO `users` (`username`, `password_hash`, `role`) VALUES
 INSERT INTO `settings` (`setting_key`, `setting_value`) VALUES
 ('site_name', 'صندوق الإسكان والتطوير'),
 ('site_tagline', 'نحو سكن كريم وحياة أفضل'),
-('logo', ''),  -- فارغ = الشعار الافتراضي (logo.png / logow.png)
+-- ملفات الهوية: أسماء ملفات داخل مجلد brand (uploads/img) — تُغيَّر من لوحة التحكم
+('logo_light', 'logo.png'),
+('logo_dark', 'logow.png'),
+('favicon', 'favicon.png'),
+('apple_touch_icon', 'apple-touch-icon.png'),
+-- النمط الافتراضي للزائر الجديد: light أو dark
+('default_theme', 'light'),
 ('address', 'الرياض - المملكة العربية السعودية'),
 ('phone1', '0110000000'),
 ('phone2', '0500000000'),

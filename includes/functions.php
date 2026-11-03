@@ -366,6 +366,15 @@ const SORTABLE_TABLES = [
     'slider'          => ['col_sort' => 'sort_order', 'col_id' => 'id'],
 ];
 
+/** جداول تُدار من لوحة التحكم دون ترتيب يدوي (تُرتَّب بالتاريخ) */
+const UNSORTED_CRUD_TABLES = ['news'];
+
+/** هل يُسمح بإدارة هذا الجدول عبر admin_handle_crud؟ */
+function crud_table_allowed(string $table): bool
+{
+    return isset(SORTABLE_TABLES[$table]) || in_array($table, UNSORTED_CRUD_TABLES, true);
+}
+
 function move_item(string $table, int $id, string $direction): bool
 {
     if (!isset(SORTABLE_TABLES[$table])) return false;
@@ -436,14 +445,17 @@ function emit_security_headers(): void
    الافتراضي داكن، ويُحفظ اختيار الزائر في المتصفح (localStorage + Cookie).
    ========================================================================== */
 
-/** النمط الحالي: اختيار الزائر المحفوظ في الكوكي، وإلا DEFAULT_THEME من config.php. */
+/** النمط الافتراضي للزائر الجديد (إعداد default_theme من لوحة التحكم). */
+function default_theme(): string
+{
+    return setting('default_theme', 'light') === 'dark' ? 'dark' : 'light';
+}
+
+/** النمط الحالي: اختيار الزائر المحفوظ في الكوكي، وإلا النمط الافتراضي. */
 function current_theme(): string
 {
     $t = $_COOKIE['site_theme'] ?? '';
-    if ($t !== 'light' && $t !== 'dark') {
-        $t = DEFAULT_THEME === 'dark' ? 'dark' : 'light';
-    }
-    return $t;
+    return ($t === 'light' || $t === 'dark') ? $t : default_theme();
 }
 
 /** صنف وسم <html>: يُطبَّق النمط من الخادم مباشرة فلا يظهر وميض حتى دون JavaScript. */
@@ -495,31 +507,49 @@ function theme_toggle_button(): string
 HTML;
 }
 
+/** إعدادات ملفات الهوية (أسماء ملفات في مجلد brand) مع عناوينها في لوحة التحكم. */
+const BRAND_FILE_SETTINGS = [
+    'logo_light'       => 'شعار النمط الفاتح',
+    'logo_dark'        => 'شعار النمط الداكن',
+    'favicon'          => 'أيقونة الموقع (Favicon)',
+    'apple_touch_icon' => 'أيقونة أجهزة Apple',
+];
+
 /**
- * الشعار حسب النمط: LOGO_LIGHT للفاتح و LOGO_DARK للداكن (من config.php).
- * إن رفع المدير شعارًا مخصصًا من الإعدادات يُعرض هو في النمطين.
+ * الشعار حسب النمط: إعداد logo_light للفاتح و logo_dark للداكن.
+ * إن غاب أحدهما يُستخدم الآخر في النمطين، وإن غاب كلاهما يُعرض اسم الموقع نصًا.
  */
 function brand_logo(string $alt, string $class = ''): string
 {
-    $custom = (string) setting('logo', '');
-    $cls = trim('brand-logo ' . $class);
-    if (upload_exists($custom, 'logo')) {
-        return '<img class="' . e($cls) . '" src="' . e(upload_url($custom, 'logo')) . '" alt="' . e($alt) . '">';
+    $cls   = trim('brand-logo ' . $class);
+    $light = upload_exists(setting('logo_light'), 'brand') ? setting('logo_light') : '';
+    $dark  = upload_exists(setting('logo_dark'), 'brand') ? setting('logo_dark') : '';
+    if ($light === '' && $dark === '') {
+        return '<span class="brand-fallback">' . e(setting('site_name', 'الصندوق')) . '</span>';
     }
-    $img = function (string $file, string $mode) use ($cls, $alt): string {
+    $img = function (string $file, string $extraClass) use ($cls, $alt): string {
         // الأبعاد من الملف نفسه حتى تبقى صحيحة لو استُبدل الشعار
-        $size = @getimagesize(ROOT_PATH . '/' . ASSETS_URL . '/' . DEFAULT_IMG_DIR . '/' . $file);
+        $size = @getimagesize(upload_path($file, 'brand'));
         $wh = $size ? ' width="' . (int)$size[0] . '" height="' . (int)$size[1] . '"' : '';
-        return '<img class="' . e($cls . ' logo-' . $mode) . '" src="' . e(asset(DEFAULT_IMG_DIR . '/' . $file)) . '" alt="' . e($alt) . '"' . $wh . '>';
+        return '<img class="' . e(trim($cls . ' ' . $extraClass)) . '" src="' . e(upload_url($file, 'brand')) . '" alt="' . e($alt) . '"' . $wh . '>';
     };
-    return $img(LOGO_LIGHT, 'light') . $img(LOGO_DARK, 'dark');
+    if ($light === '' || $dark === '' || $light === $dark) {
+        return $img($light !== '' ? $light : $dark, ''); // شعار واحد للنمطين
+    }
+    return $img($light, 'logo-light') . $img($dark, 'logo-dark');
 }
 
-/** أيقونة الموقع (favicon) وأيقونة أجهزة Apple — نفس أيقونات البوابة. */
+/** أيقونة الموقع وأيقونة أجهزة Apple (إعدادا favicon و apple_touch_icon). */
 function favicon_links(): string
 {
-    $fav = e(asset(DEFAULT_IMG_DIR . '/favicon.png'));
-    return '<link rel="icon" type="image/png" sizes="64x64" href="' . $fav . '">' . "\n"
-         . '<link rel="shortcut icon" type="image/png" href="' . $fav . '">' . "\n"
-         . '<link rel="apple-touch-icon" sizes="180x180" href="' . e(asset(DEFAULT_IMG_DIR . '/apple-touch-icon.png')) . '">';
+    $out = [];
+    if (upload_exists(setting('favicon'), 'brand')) {
+        $fav = e(upload_url(setting('favicon'), 'brand'));
+        $out[] = '<link rel="icon" href="' . $fav . '">';
+        $out[] = '<link rel="shortcut icon" href="' . $fav . '">';
+    }
+    if (upload_exists(setting('apple_touch_icon'), 'brand')) {
+        $out[] = '<link rel="apple-touch-icon" sizes="180x180" href="' . e(upload_url(setting('apple_touch_icon'), 'brand')) . '">';
+    }
+    return implode("\n", $out);
 }

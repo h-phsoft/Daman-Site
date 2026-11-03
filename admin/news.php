@@ -6,7 +6,7 @@ $TABLE         = 'news';
 $REDIRECT      = 'news.php';
 $TITLE_SINGULAR = 'خبر';
 $FIELDS = [
-    ['name' => 'title',        'label' => 'عنوان الخبر', 'type' => 'text'],
+    ['name' => 'title',        'label' => 'عنوان الخبر', 'type' => 'text', 'max' => 200],
     ['name' => 'image',        'label' => 'صورة الخبر', 'type' => 'image', 'upload' => 'news', 'nullable' => true],
     ['name' => 'publish_date', 'label' => 'تاريخ النشر', 'type' => 'date'],
     ['name' => 'is_active',    'label' => 'الحالة', 'type' => 'checkbox', 'default' => 1],
