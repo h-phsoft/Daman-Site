@@ -36,7 +36,9 @@ require ROOT_PATH . '/includes/header.php';
   <?php if (!$items): ?>
     <p>لا توجد أخبار منشورة حاليًا.</p>
   <?php else: ?>
-    <?php foreach ($items as $n): ?>
+    <?php foreach ($items as $n):
+        $excerpt = trim(html_entity_decode(strip_tags((string)$n['excerpt_html']), ENT_QUOTES, 'UTF-8'));
+    ?>
       <article class="news-row">
         <a class="thumb" href="<?= url('pages/news/article.php?slug=' . urlencode($n['slug'])) ?>" aria-hidden="true" tabindex="-1">
           <img src="<?= e(upload_url($n['image'], 'img/placeholder-news1.svg')) ?>" alt="" loading="lazy">
@@ -48,7 +50,7 @@ require ROOT_PATH . '/includes/header.php';
           <h2 style="margin:.2rem 0 .4rem;font-size:1.15rem">
             <a href="<?= url('pages/news/article.php?slug=' . urlencode($n['slug'])) ?>"><?= e($n['title']) ?></a>
           </h2>
-          <p style="color:var(--c-muted);margin:0 0 .6rem"><?= mb_substr(strip_tags((string)$n['excerpt_html']), 0, 180) ?>…</p>
+          <p style="color:var(--c-muted);margin:0 0 .6rem"><?= e(mb_substr($excerpt, 0, 180)) ?><?= mb_strlen($excerpt) > 180 ? '…' : '' ?></p>
           <a class="more" href="<?= url('pages/news/article.php?slug=' . urlencode($n['slug'])) ?>">اقرأ الخبر كاملًا</a>
         </div>
       </article>
