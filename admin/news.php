@@ -9,16 +9,18 @@ $FIELDS = [
     ['name' => 'title',        'label' => 'عنوان الخبر', 'type' => 'text', 'max' => 200],
     ['name' => 'image',        'label' => 'صورة الخبر', 'type' => 'image', 'upload' => 'news', 'nullable' => true],
     ['name' => 'publish_date', 'label' => 'تاريخ النشر', 'type' => 'date'],
+    ['name' => 'excerpt_html', 'label' => 'مقتطف الخبر (يظهر في القوائم)', 'type' => 'html', 'nullable' => true],
+    ['name' => 'content_html', 'label' => 'نص الخبر الكامل', 'type' => 'html', 'nullable' => true],
     ['name' => 'is_active',    'label' => 'الحالة', 'type' => 'checkbox', 'default' => 1],
 ];
 $LIST_COLS = function (string $mode, ?array $r = null) {
-    if ($mode === 'head') return ['العنوان', 'الصورة', 'التاريخ', 'المقتطف والمحتوى'];
+    if ($mode === 'head') return ['العنوان', 'الصورة', 'التاريخ', 'المقتطف', 'النص الكامل'];
     return [
         e((string)($r['title'] ?? '')),
         admin_thumb($r['image'] ?? null, 'news'),
         e(ar_date((string)($r['publish_date'] ?? ''))),
-        '<a href="' . e(url('admin/editor.php?table=news&col=excerpt_html&id=' . (int)$r['id'])) . '">المقتطف ↗</a> · ' .
-        '<a href="' . e(url('admin/editor.php?table=news&col=content_html&id=' . (int)$r['id'])) . '">المحتوى ↗</a>',
+        admin_text_status($r['excerpt_html'] ?? null),
+        admin_text_status($r['content_html'] ?? null),
     ];
 };
 require __DIR__ . '/_list_page.php';
