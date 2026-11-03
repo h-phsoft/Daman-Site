@@ -128,6 +128,8 @@ require __DIR__ . '/_top.php';
             <span class="logo-preview<?= $key === 'logo_dark' ? ' on-dark' : '' ?><?= str_starts_with($key, 'logo') ? '' : ' is-icon' ?>">
               <?php if ($has): ?>
                 <img src="<?= e(upload_url($file, 'brand')) ?>" alt="<?= e($label) ?>">
+              <?php elseif ($file !== ''): ?>
+                <?= admin_missing_badge($file, 'brand') ?>
               <?php else: ?>
                 <span style="color:var(--c-muted);font-size:.85rem">لا يوجد ملف</span>
               <?php endif; ?>

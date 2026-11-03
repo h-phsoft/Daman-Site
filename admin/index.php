@@ -22,11 +22,38 @@ $stats = [
 $latestNews  = fetchAll('SELECT id, title, publish_date, is_active FROM news ORDER BY publish_date DESC, id DESC LIMIT 5');
 $latestMsgs  = fetchAll("SELECT id, type, name, created_at FROM contact_messages ORDER BY created_at DESC, id DESC LIMIT 5");
 $typeLabels  = ['contact' => 'تواصل', 'suggestion' => 'اقتراح', 'complaint' => 'شكوى'];
+$missingFiles = find_missing_uploads();
 
 $ADMIN_TITLE  = 'لوحة التحكم — الرئيسية';
 $ADMIN_ACTIVE = 'index';
 require __DIR__ . '/_top.php';
 ?>
+<?php if ($missingFiles): ?>
+<div class="panel missing-panel" role="alert">
+  <h2 style="margin-top:0">⚠ ملفات مفقودة على الخادم (<?= count($missingFiles) ?>)</h2>
+  <p style="margin-top:0;color:var(--c-muted)">
+    هذه الملفات مسجّلة في قاعدة البيانات لكنها غير موجودة في مجلدها داخل <code dir="ltr"><?= e(UPLOAD_URL) ?></code>،
+    لذلك يعرض الموقع مكانها صورة بديلة من <code dir="ltr"><?= e(ASSETS_URL . '/' . DEFAULT_IMG_DIR) ?></code>.
+    ارفع الملف من جديد من صفحة العنصر، أو انسخه إلى المسار الظاهر.
+  </p>
+  <div class="table-wrap" style="box-shadow:none">
+    <table class="data" style="min-width:auto">
+      <thead><tr><th>القسم</th><th>العنصر</th><th>المسار المتوقع</th><th></th></tr></thead>
+      <tbody>
+      <?php foreach ($missingFiles as $m): ?>
+        <tr>
+          <td><?= e($m['section']) ?></td>
+          <td><?= e($m['item']) ?></td>
+          <td dir="ltr" style="text-align:left"><code><?= e($m['path']) ?></code></td>
+          <td><a href="<?= e($m['edit']) ?>">إصلاح ←</a></td>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+<?php endif; ?>
+
 <div class="stat-cards">
   <?php foreach ($stats as [$lbl, $num, $icon, $link]): ?>
     <a class="stat-card" href="<?= e(url('admin/' . $link)) ?>" style="text-decoration:none;color:inherit">

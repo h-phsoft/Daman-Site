@@ -51,10 +51,8 @@ if (!isset($LIST_COLS)) {
             return $h;
         }
         $out = [];
-        if ($imgCol && !empty($r[$imgCol['name']])) {
-            $out[] = '<img class="row-thumb" src="' . e(upload_url($r[$imgCol['name']], $imgCol['upload'])) . '" alt="">';
-        } elseif ($imgCol) {
-            $out[] = '—';
+        if ($imgCol) {
+            $out[] = admin_thumb($r[$imgCol['name']] ?? null, $imgCol['upload']);
         }
         foreach ($textCols as $f) {
             $v = (string)($r[$f['name']] ?? '');

@@ -14,7 +14,7 @@ $LIST_COLS = function (string $mode, ?array $r = null) {
     if ($mode === 'head') return ['المشروع', 'الصورة', 'المحتوى'];
     return [
         e((string)($r['title'] ?? '')),
-        !empty($r['image']) ? '<img class="row-thumb" src="' . e(upload_url($r['image'], 'projects')) . '" alt="">' : '—',
+        admin_thumb($r['image'] ?? null, 'projects'),
         !empty($r['content_html']) ? '<a href="' . e(url('admin/editor.php?table=projects&id=' . (int)$r['id'])) . '">تحرير النص ↗</a>' : '<span style="color:var(--c-danger)">بدون نص</span>',
     ];
 };

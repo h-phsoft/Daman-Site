@@ -174,7 +174,11 @@ require __DIR__ . '/_top.php';
         <label for="simg">صورة الفقرة (اختيارية)</label>
         <?php if (!empty($EDIT_SECTION['image'])): ?>
           <div style="display:flex;gap:.6rem;align-items:center;margin-bottom:.4rem">
-            <img src="<?= e(upload_url($EDIT_SECTION['image'], 'sections')) ?>" alt="" style="width:74px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--c-line)">
+            <?php if (upload_exists($EDIT_SECTION['image'], 'sections')): ?>
+              <img src="<?= e(upload_url($EDIT_SECTION['image'], 'sections')) ?>" alt="" style="width:74px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--c-line)">
+            <?php else: ?>
+              <?= admin_missing_badge($EDIT_SECTION['image'], 'sections') ?>
+            <?php endif; ?>
             <label style="margin:0;font-weight:500;display:inline-flex;gap:.3rem;align-items:center">
               <input type="checkbox" name="keep_image" value="<?= e($EDIT_SECTION['image']) ?>" checked> إبقاء الحالية
             </label>
@@ -206,7 +210,7 @@ require __DIR__ . '/_top.php';
           <form class="inline-form" method="post"><?= csrf_field() ?><input type="hidden" name="action" value="move_section"><input type="hidden" name="page_id" value="<?= (int)$pageId ?>"><input type="hidden" name="section_id" value="<?= (int)$s['id'] ?>"><input type="hidden" name="dir" value="up"><button class="btn-icon" type="submit" aria-label="لأعلى">▲</button></form>
           <form class="inline-form" method="post"><?= csrf_field() ?><input type="hidden" name="action" value="move_section"><input type="hidden" name="page_id" value="<?= (int)$pageId ?>"><input type="hidden" name="section_id" value="<?= (int)$s['id'] ?>"><input type="hidden" name="dir" value="down"><button class="btn-icon" type="submit" aria-label="لأسفل">▼</button></form>
         </td>
-        <td><?= $s['image'] ? '<img class="row-thumb" src="' . e(upload_url($s['image'], 'sections')) . '" alt="">' : '—' ?></td>
+        <td><?= admin_thumb($s['image'] ?? null, 'sections') ?></td>
         <td><?= e($s['title']) ?></td>
         <td><?= mb_substr(strip_tags((string)$s['content_html']), 0, 50) !== '' ? e(mb_substr(strip_tags((string)$s['content_html']), 0, 50)) . '…' : '<span style="color:var(--c-muted)">فارغة</span>' ?></td>
         <td style="white-space:nowrap">

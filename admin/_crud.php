@@ -177,7 +177,9 @@ function admin_render_form(string $table, array $fields, ?array $row, string $re
           <?php elseif ($f['type'] === 'image' || $f['type'] === 'file'): ?>
             <?php if ($isEdit && $val): ?>
               <div style="display:flex;gap:.6rem;align-items:center;margin-bottom:.4rem">
-                <?php if ($f['type'] === 'image'): ?>
+                <?php if (!upload_exists((string)$val, $f['upload'])): ?>
+                  <?= admin_missing_badge((string)$val, $f['upload']) ?>
+                <?php elseif ($f['type'] === 'image'): ?>
                   <img src="<?= e(upload_url((string)$val, $f['upload'])) ?>" alt="" style="width:74px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--c-line)">
                 <?php else: ?>
                   <a href="<?= e(upload_url((string)$val, $f['upload'])) ?>" target="_blank" rel="noopener">الملف الحالي ↗</a>
@@ -265,4 +267,85 @@ function admin_render_list(string $table, array $rows, callable $colsFn, string 
   </table>
 </div>
     <?php
+}
+
+/* ================================================================== */
+/* تنبيه الملفات المفقودة: ملف مسجّل في قاعدة البيانات لكنه غير موجود */
+/* في مجلده داخل uploads (فيعرض الموقع صورة بديلة من assets).        */
+/* ================================================================== */
+
+/** المسار النسبي المتوقع للملف (للعرض في التنبيه) مثل uploads/news/x.jpg */
+function upload_expected_path(?string $stored, string $type): string
+{
+    return UPLOAD_URL . '/' . upload_dir($type) . '/' . upload_name($stored);
+}
+
+/** شارة «الملف مفقود» مع المسار المتوقع. */
+function admin_missing_badge(?string $stored, string $type): string
+{
+    $path = upload_expected_path($stored, $type);
+    return '<span class="missing-file" title="' . e('غير موجود على الخادم: ' . $path) . '">'
+         . '<span class="badge badge-off">⚠ الملف مفقود</span>'
+         . '<small dir="ltr">' . e($path) . '</small></span>';
+}
+
+/** صورة مصغرة لقوائم لوحة التحكم: «—» إن لم تُسجَّل صورة، وتنبيه إن كان ملفها مفقودًا. */
+function admin_thumb(?string $stored, string $type): string
+{
+    if (upload_name($stored) === '') return '—';
+    if (!upload_exists($stored, $type)) return admin_missing_badge($stored, $type);
+    return '<img class="row-thumb" src="' . e(upload_url($stored, $type)) . '" alt="">';
+}
+
+/** رابط ملف (مثل PDF) في القوائم، مع تنبيه إن كان مفقودًا. */
+function admin_file_link(?string $stored, string $type, string $label = 'PDF ↗'): string
+{
+    if (upload_name($stored) === '') return '—';
+    if (!upload_exists($stored, $type)) return admin_missing_badge($stored, $type);
+    return '<a href="' . e(upload_url($stored, $type)) . '" target="_blank" rel="noopener">' . e($label) . '</a>';
+}
+
+/**
+ * كل الملفات المسجلة في قاعدة البيانات وغير الموجودة على الخادم.
+ * @return array<int, array{section:string, item:string, path:string, edit:string}>
+ */
+function find_missing_uploads(): array
+{
+    // الجدول => [عمود الملف، نوع الرفع، عمود العنوان، اسم القسم، صفحة الإدارة]
+    $sources = [
+        'slider'          => ['image',     'slider',     'title',    'السلايدر',          'slider.php'],
+        'news'            => ['image',     'news',       'title',    'الأخبار',           'news.php'],
+        'products'        => ['image',     'products',   'title',    'المنتجات',          'products.php'],
+        'projects'        => ['image',     'projects',   'title',    'المشاريع المستهدفة', 'projects.php'],
+        'board_members'   => ['image',     'board',      'name',     'مجلس الإدارة',      'board.php'],
+        'executives'      => ['image',     'executives', 'name',     'الإدارة التنفيذية', 'executives.php'],
+        'important_links' => ['image',     'links',      'title',    'المواقع الهامة',    'links.php'],
+        'reports'         => ['file_path', 'reports',    'title',    'التقارير السنوية',  'reports.php'],
+    ];
+    $missing = [];
+    foreach ($sources as $table => [$col, $type, $titleCol, $section, $page]) {
+        $rows = fetchAll("SELECT id, `$titleCol` AS t, `$col` AS f FROM `$table` WHERE `$col` IS NOT NULL AND `$col` <> ''");
+        foreach ($rows as $r) {
+            if (!upload_exists($r['f'], $type)) {
+                $missing[] = ['section' => $section, 'item' => (string)($r['t'] ?: '#' . $r['id']),
+                              'path' => upload_expected_path($r['f'], $type),
+                              'edit' => url('admin/' . $page . '?edit=' . (int)$r['id'])];
+            }
+        }
+    }
+    foreach (fetchAll("SELECT ps.id, ps.page_id, ps.title, ps.image FROM page_sections ps WHERE ps.image IS NOT NULL AND ps.image <> ''") as $r) {
+        if (!upload_exists($r['image'], 'sections')) {
+            $missing[] = ['section' => 'فقرات الصفحات', 'item' => (string)$r['title'],
+                          'path' => upload_expected_path($r['image'], 'sections'),
+                          'edit' => url('admin/pages.php?page=' . (int)$r['page_id'] . '&section=' . (int)$r['id'])];
+        }
+    }
+    foreach (BRAND_FILE_SETTINGS as $key => $label) {
+        $f = setting($key);
+        if ($f !== '' && !upload_exists($f, 'brand')) {
+            $missing[] = ['section' => 'إعدادات الموقع', 'item' => $label,
+                          'path' => upload_expected_path($f, 'brand'), 'edit' => url('admin/settings.php')];
+        }
+    }
+    return $missing;
 }
