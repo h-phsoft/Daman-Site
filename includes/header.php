@@ -52,6 +52,7 @@ $menu = [
 <meta property="og:locale" content="ar_SA">
 <meta property="og:site_name" content="<?= e($siteName) ?>">
 <link rel="icon" type="image/svg+xml" href="<?= e(upload_url($logoPath !== '' ? $logoPath : null, 'img/logo.svg')) ?>">
+<?= theme_head_script() ?>
 <link rel="stylesheet" href="<?= asset('vendor/fonts/fonts.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 </head>
@@ -104,6 +105,8 @@ $menu = [
         <?php endforeach; ?>
       </ul>
     </nav>
+
+    <?= theme_toggle_button() ?>
   </div>
 </header>
 

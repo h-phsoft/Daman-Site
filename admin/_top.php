@@ -42,6 +42,7 @@ $navItems = [
 <meta name="robots" content="noindex,nofollow">
 <title><?= e($adminTitle) ?> | إدارة <?= e(setting('site_name', 'الصندوق')) ?></title>
 <link rel="icon" type="image/svg+xml" href="<?= e(upload_url($logoPath ?: null, 'img/logo.svg')) ?>">
+<?= theme_head_script() ?>
 <link rel="stylesheet" href="<?= asset('vendor/fonts/fonts.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
@@ -80,6 +81,7 @@ $navItems = [
     <div class="admin-topbar">
       <h1><?= e($adminTitle) ?></h1>
       <span style="color:var(--c-muted);font-size:.85rem">مرحبًا، <?= e($u['username'] ?? '') ?> — <?= date('Y-m-d') ?></span>
+      <?= theme_toggle_button() ?>
     </div>
     <?php foreach (flash_get() as $fl): ?>
       <div class="alert <?= $fl['type'] === 'error' ? 'alert-error' : 'alert-success' ?>" role="alert"><?= e($fl['msg']) ?></div>

@@ -41,11 +41,13 @@ $siteName = setting('site_name', 'الصندوق');
 <meta name="robots" content="noindex,nofollow">
 <title>تسجيل الدخول | إدارة <?= e($siteName) ?></title>
 <link rel="icon" type="image/svg+xml" href="<?= e(asset('img/logo.svg')) ?>">
+<?= theme_head_script() ?>
 <link rel="stylesheet" href="<?= asset('vendor/fonts/fonts.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
 </head>
 <body class="login-wrap">
+  <?= theme_toggle_button() ?>
   <main class="login-card" id="main-content" aria-labelledby="loginTitle">
     <img class="logo-center" src="<?= e(upload_url(setting('logo') ?: null, 'img/logo.svg')) ?>" alt="شعار <?= e($siteName) ?>" width="74" height="74">
     <h1 id="loginTitle" style="text-align:center;font-size:1.25rem">دخول لوحة التحكم</h1>
