@@ -7,7 +7,7 @@ require_once __DIR__ . '/includes/functions.php';
 
 $slides = fetchAll('SELECT * FROM slider WHERE is_active = 1 ORDER BY sort_order ASC, id ASC');
 $products = fetchAll('SELECT * FROM products WHERE is_active = 1 ORDER BY sort_order ASC, id ASC');
-$latestNews = fetchAll('SELECT * FROM news WHERE is_active = 1 ORDER BY publish_date DESC, id DESC LIMIT 6');
+$latestNews = fetchAll('SELECT * FROM news WHERE is_active = 1 ORDER BY publish_date DESC, id DESC LIMIT 3');
 
 $PAGE_TITLE = null; // اسم الموقع مباشرة
 $ACTIVE_NAV = 'home';
@@ -74,7 +74,7 @@ require ROOT_PATH . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- ===================== آخر الأخبار (سلايدر أفقي) ===================== -->
+<!-- ===================== آخر الأخبار (آخر 3 أخبار بنفس عرض صفحة الأخبار) ===================== -->
 <?php if ($latestNews): ?>
 <section class="section" style="background:var(--c-surface)" aria-labelledby="newsHeading">
   <div class="container">
@@ -82,21 +82,27 @@ require ROOT_PATH . '/includes/header.php';
       <h2 id="newsHeading">آخر الأخبار</h2>
       <p>تابع أحدث المستجدات والقرارات من الصندوق.</p>
     </div>
-    <div class="news-scroller" role="region" aria-label="قائمة آخر الأخبار - تمرير أفقي" tabindex="0">
-      <?php foreach ($latestNews as $n): ?>
-        <article class="news-item">
-          <div class="thumb">
-            <img src="<?= e(upload_url($n['image'], 'img/placeholder-news1.svg')) ?>" alt="<?= e($n['title']) ?>" loading="lazy">
-          </div>
-          <div class="card-body">
-            <span class="meta-date"><time datetime="<?= e($n['publish_date']) ?>"><?= e(ar_date($n['publish_date'])) ?></time></span>
-            <h3><?= e($n['title']) ?></h3>
-            <div class="desc"><?= clean_html($n['excerpt_html']) ?></div>
-            <a class="more" href="<?= url('pages/news/article.php?slug=' . urlencode($n['slug'])) ?>">المزيد</a>
-          </div>
-        </article>
-      <?php endforeach; ?>
-    </div>
+    <?php foreach ($latestNews as $n):
+        $newsUrl = url('pages/news/article.php?slug=' . urlencode($n['slug']));
+        $excerpt = trim(html_entity_decode(strip_tags((string)$n['excerpt_html']), ENT_QUOTES, 'UTF-8'));
+        $short   = mb_substr($excerpt, 0, 180);
+    ?>
+      <article class="news-row">
+        <a class="thumb" href="<?= $newsUrl ?>" aria-hidden="true" tabindex="-1">
+          <img src="<?= e(upload_url($n['image'], 'img/placeholder-news1.svg')) ?>" alt="" loading="lazy">
+        </a>
+        <div style="flex:1">
+          <span class="meta-date" style="color:var(--c-accent-dark);font-size:.82rem;font-weight:600">
+            <time datetime="<?= e($n['publish_date']) ?>"><?= e(ar_date($n['publish_date'])) ?></time>
+          </span>
+          <h3 style="margin:.2rem 0 .4rem;font-size:1.15rem">
+            <a href="<?= $newsUrl ?>"><?= e($n['title']) ?></a>
+          </h3>
+          <p style="color:var(--c-muted);margin:0 0 .6rem"><?= e($short) ?><?= mb_strlen($excerpt) > 180 ? '…' : '' ?></p>
+          <a class="more" href="<?= $newsUrl ?>">اقرأ الخبر كاملًا</a>
+        </div>
+      </article>
+    <?php endforeach; ?>
     <p style="text-align:center;margin-top:1rem">
       <a class="btn btn-outline" href="<?= url('pages/news/index.php') ?>">كل الأخبار</a>
     </p>
