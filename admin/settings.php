@@ -91,7 +91,7 @@ require __DIR__ . '/_top.php';
       <div>
         <label>الشعار الحالي</label>
         <div style="display:flex;gap:.8rem;align-items:center">
-          <img src="<?= e(upload_url(setting('logo') ?: null, 'img/logo.svg')) ?>" alt="الشعار" style="width:74px;height:74px;object-fit:contain;background:var(--c-surface);border-radius:8px;padding:6px;border:1px solid var(--c-line)">
+          <span class="logo-preview"><?= brand_logo('الشعار') ?></span>
           <input type="file" name="upload_logo" accept=".jpg,.jpeg,.png,.webp,.svg">
         </div>
         <small style="color:var(--c-muted)">PNG / SVG / JPG حتى 5MB — يُنصح بشكل مربع شفاف الخلفية.</small>

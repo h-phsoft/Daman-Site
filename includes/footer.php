@@ -18,8 +18,7 @@ $socials  = [
   <div class="container footer-grid">
     <div class="footer-brand">
       <a class="brand" href="<?= url('') ?>">
-        <img src="<?= e(upload_url(setting('logo') ?: null, 'img/logo.svg')) ?>"
-             alt="شعار <?= e($siteName) ?>" width="52" height="52">
+        <?= brand_logo('شعار ' . $siteName) ?>
         <strong><?= e($siteName) ?></strong>
       </a>
       <p class="footer-about"><?= e(setting('footer_about', '')) ?></p>

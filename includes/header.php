@@ -13,7 +13,6 @@ emit_security_headers();
 
 $siteName  = setting('site_name', 'الصندوق');
 $tagline   = setting('site_tagline', '');
-$logoPath  = setting('logo', 'assets/img/logo.svg');
 $pageDesc  = $PAGE_DESC ?? setting('meta_description', '');
 $activeNav = $ACTIVE_NAV ?? '';
 
@@ -51,7 +50,7 @@ $menu = [
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ar_SA">
 <meta property="og:site_name" content="<?= e($siteName) ?>">
-<link rel="icon" type="image/svg+xml" href="<?= e(upload_url($logoPath !== '' ? $logoPath : null, 'img/logo.svg')) ?>">
+<?= favicon_links() ?>
 <?= theme_head_script() ?>
 <link rel="stylesheet" href="<?= asset('vendor/fonts/fonts.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
@@ -62,8 +61,7 @@ $menu = [
 <header class="site-header" id="siteHeader">
   <div class="container header-inner">
     <a class="brand" href="<?= url('') ?>" aria-label="<?= e($siteName) ?>">
-      <img src="<?= e(upload_url($logoPath !== '' ? $logoPath : null, 'img/logo.svg')) ?>"
-           alt="شعار <?= e($siteName) ?>" width="56" height="56">
+      <?= brand_logo('شعار ' . $siteName) ?>
       <span class="brand-text">
         <strong><?= e($siteName) ?></strong>
         <?php if ($tagline): ?><small><?= e($tagline) ?></small><?php endif; ?>
