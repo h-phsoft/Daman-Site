@@ -7,6 +7,9 @@ declare(strict_types=1);
 require_once __DIR__ . '/_crud.php';
 require_admin();
 
+// روابط حسابات التواصل الاجتماعي (وحدها تُضاف لها https:// عند الحاجة)
+const SOCIAL_KEYS = ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube'];
+
 $TEXT_KEYS = [
     'site_name'        => 'اسم الموقع',
     'site_tagline'     => 'الوصف المختصر (Tagline)',
@@ -31,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($TEXT_KEYS as $key => $label) {
             if (!array_key_exists($key, $_POST)) continue;
             $v = trim((string)$_POST[$key]);
-            if (in_array($key, ['facebook','twitter','instagram','linkedin','youtube'], true) && $v !== '' && !valid_url($v)) {
+            $isSocial = in_array($key, SOCIAL_KEYS, true);
+            if ($isSocial && $v !== '' && !valid_url($v)) {
                 flash_set('error', "$label: رابط غير صالح.");
                 continue;
             }
@@ -43,7 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 flash_set('error', 'اسم الموقع مطلوب.');
                 continue;
             }
-            set_setting($key, normalize_url_input($v));
+            // تطبيع الروابط فقط؛ الاسم والعنوان والهاتف والبريد تُحفظ كما هي
+            set_setting($key, $isSocial ? normalize_url_input($v) : $v);
         }
         // رفع الشعار
         if (!empty($_FILES['upload_logo']['name'])) {
@@ -101,7 +106,7 @@ require __DIR__ . '/_top.php';
           <label<?= $key === 'site_name' ? ' class="req"' : '' ?> for="s-<?= e($key) ?>"><?= e($label) ?></label>
           <input type="text" id="s-<?= e($key) ?>" name="<?= e($key) ?>" dir="ltr"
                  value="<?= e(setting($key)) ?>"
-                 <?= in_array($key, ['facebook','twitter','instagram','linkedin','youtube'], true) ? 'placeholder="https://"' : '' ?>>
+                 <?= in_array($key, SOCIAL_KEYS, true) ? 'placeholder="https://"' : '' ?>>
         </div>
       <?php endforeach; ?>
       <div><button type="submit" class="btn btn-primary">حفظ الإعدادات</button></div>
