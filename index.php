@@ -76,7 +76,7 @@ require ROOT_PATH . '/includes/header.php';
 
 <!-- ===================== آخر الأخبار (سلايدر أفقي) ===================== -->
 <?php if ($latestNews): ?>
-<section class="section" style="background:#fff" aria-labelledby="newsHeading">
+<section class="section" style="background:var(--c-surface)" aria-labelledby="newsHeading">
   <div class="container">
     <div class="section-head">
       <h2 id="newsHeading">آخر الأخبار</h2>
